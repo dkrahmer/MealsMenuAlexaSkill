@@ -1,0 +1,384 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "meals menu",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "GetMealIntent",
+                    "slots": [
+                        {
+                            "name": "meal",
+                            "type": "meal"
+                        },
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE"
+                        },
+                        {
+                            "name": "getMealInitializer",
+                            "type": "getMealInitializer"
+                        }
+                    ],
+                    "samples": [
+                        "{meal}",
+                        "{date}",
+                        "{meal} {date}",
+                        "{date} {meal}",
+                        "{date} for {meal}",
+                        "{meal} for {date}",
+                        "{meal} on {date}",
+                        "{getMealInitializer} {meal}",
+                        "{getMealInitializer} {meal} {date}",
+                        "{getMealInitializer} {meal} on {date}",
+                        "{getMealInitializer} {meal} for {date}",
+                        "{getMealInitializer} {date}",
+                        "{getMealInitializer} {date} {meal}",
+                        "{getMealInitializer} {date} for {meal}"
+                    ]
+                },
+                {
+                    "name": "SetMealsApiUrlIntent",
+                    "slots": [
+                        {
+                            "name": "apiUrlKeyWord",
+                            "type": "AMAZON.SearchQuery",
+                            "samples": [
+                                "{apiUrlKeyWord}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "set the API URL",
+                        "to set the API URL",
+                        "to set API URL",
+                        "set API URL",
+                        "to set meals API URL",
+                        "set meals API URL"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "meal",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "all",
+                                "synonyms": [
+                                    "eating",
+                                    "meal",
+                                    "refreshment",
+                                    "meals",
+                                    "all eats",
+                                    "eats",
+                                    "nourishment",
+                                    "sustenance",
+                                    "eating time",
+                                    "grub time",
+                                    "grub",
+                                    "chow time",
+                                    "snack",
+                                    "refreshments",
+                                    "brunch",
+                                    "food",
+                                    "any meals",
+                                    "any meal",
+                                    "all meals",
+                                    "any"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "dessert",
+                                "synonyms": [
+                                    "cakes",
+                                    "confections",
+                                    "confection",
+                                    "pastries",
+                                    "pastry",
+                                    "sweet course",
+                                    "goodies",
+                                    "sweets"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "supper",
+                                "synonyms": [
+                                    "evening meal",
+                                    "tonight",
+                                    "evening",
+                                    "at night",
+                                    "night",
+                                    "dinner"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "lunch",
+                                "synonyms": [
+                                    "noon meal",
+                                    "afternoon meal",
+                                    "afternoon",
+                                    "noon"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "breakfast",
+                                "synonyms": [
+                                    "the morning",
+                                    "morning meal",
+                                    "in the morning",
+                                    "morning"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getMealInitializer",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "what is for",
+                                "synonyms": [
+                                    "what's for"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we eating",
+                                "synonyms": [
+                                    "what we are eating"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we having",
+                                "synonyms": [
+                                    "what we are having"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we eating for",
+                                "synonyms": [
+                                    "what we are eating for"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we having for",
+                                "synonyms": [
+                                    "what we are having for"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we eating on",
+                                "synonyms": [
+                                    "what we are eating on"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we having on",
+                                "synonyms": [
+                                    "what we are having on"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what was for",
+                                "synonyms": [
+                                    "what we ate for",
+                                    "what we had for"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what we had"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what we ate"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we going to eat",
+                                "synonyms": [
+                                    "what are we going to eat on",
+                                    "what are we going to eat for"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "what are we going to have",
+                                "synonyms": [
+                                    "what are we going to have on",
+                                    "what are we going to have for"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "for"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "about"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "GetMealIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "meal",
+                            "type": "meal",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {},
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.1424888573963.1216637824356.139506818213"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        },
+                        {
+                            "name": "getMealInitializer",
+                            "type": "getMealInitializer",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        }
+                    ]
+                },
+                {
+                    "name": "SetMealsApiUrlIntent",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.812629481092"
+                    },
+                    "slots": [
+                        {
+                            "name": "apiUrlKeyWord",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.457127692409.1179696007180",
+                                "elicitation": "Elicit.Slot.455939206990.443347637476"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Elicit.Slot.1424888573963.1216637824356",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Which meal?"
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.1424888573963.1216637824356.139506818213",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Which meal?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.455939206990.443347637476",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "What is your API URL key word?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.455939206990.443347637476",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "I heard {apiUrlId} , is that correct?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.457127692409.1179696007180",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "I heard {apiUrlKeyWord} , is that correct?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.812629481092",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Are you sure you want to set the Meals Menu API URL?"
+                    }
+                ]
+            }
+        ]
+    }
+}
