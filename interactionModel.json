@@ -5,51 +5,58 @@
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
-                    "samples": []
+                    "samples": [
+                        "cancel"
+                    ]
                 },
                 {
                     "name": "AMAZON.HelpIntent",
-                    "samples": []
+                    "samples": [
+                        "help"
+                    ]
                 },
                 {
                     "name": "AMAZON.StopIntent",
-                    "samples": []
+                    "samples": [
+                        "exit",
+                        "stop"
+                    ]
                 },
                 {
                     "name": "AMAZON.NavigateHomeIntent",
                     "samples": []
                 },
                 {
-                    "name": "GetMealIntent",
+                    "name": "GetMealByDateIntent",
                     "slots": [
                         {
-                            "name": "meal",
-                            "type": "meal"
+                            "name": "getMealByDateInitializer",
+                            "type": "getMealByDateInitializer"
+                        },
+                        {
+                            "name": "mealTimeName",
+                            "type": "mealTime"
                         },
                         {
                             "name": "date",
                             "type": "AMAZON.DATE"
-                        },
-                        {
-                            "name": "getMealInitializer",
-                            "type": "getMealInitializer"
                         }
                     ],
                     "samples": [
-                        "{meal}",
+                        "{mealTimeName}",
                         "{date}",
-                        "{meal} {date}",
-                        "{date} {meal}",
-                        "{date} for {meal}",
-                        "{meal} for {date}",
-                        "{meal} on {date}",
-                        "{getMealInitializer} {meal}",
-                        "{getMealInitializer} {meal} {date}",
-                        "{getMealInitializer} {meal} on {date}",
-                        "{getMealInitializer} {meal} for {date}",
-                        "{getMealInitializer} {date}",
-                        "{getMealInitializer} {date} {meal}",
-                        "{getMealInitializer} {date} for {meal}"
+                        "{mealTimeName} {date}",
+                        "{date} {mealTimeName}",
+                        "{date} for {mealTimeName}",
+                        "{mealTimeName} for {date}",
+                        "{mealTimeName} on {date}",
+                        "{getMealByDateInitializer} {mealTimeName}",
+                        "{getMealByDateInitializer} {mealTimeName} {date}",
+                        "{getMealByDateInitializer} {mealTimeName} on {date}",
+                        "{getMealByDateInitializer} {mealTimeName} for {date}",
+                        "{getMealByDateInitializer} {date}",
+                        "{getMealByDateInitializer} {date} {mealTimeName}",
+                        "{getMealByDateInitializer} {date} for {mealTimeName}"
                     ]
                 },
                 {
@@ -61,21 +68,42 @@
                             "samples": [
                                 "{apiUrlKeyWord}"
                             ]
+                        },
+                        {
+                            "name": "passphrase",
+                            "type": "AMAZON.SearchQuery",
+                            "samples": [
+                                "{passphrase}"
+                            ]
                         }
                     ],
                     "samples": [
-                        "set the API URL",
-                        "to set the API URL",
-                        "to set API URL",
-                        "set API URL",
-                        "to set meals API URL",
-                        "set meals API URL"
+                        "setup",
+                        "to setup",
+                        "set up",
+                        "to set up"
+                    ]
+                },
+                {
+                    "name": "GetMealByDescriptionIntent",
+                    "slots": [
+                        {
+                            "name": "mealRequestPhrase",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "which date {mealRequestPhrase}",
+                        "what date {mealRequestPhrase}",
+                        "which day {mealRequestPhrase}",
+                        "what day {mealRequestPhrase}",
+                        "when {mealRequestPhrase}"
                     ]
                 }
             ],
             "types": [
                 {
-                    "name": "meal",
+                    "name": "mealTime",
                     "values": [
                         {
                             "name": {
@@ -157,7 +185,7 @@
                     ]
                 },
                 {
-                    "name": "getMealInitializer",
+                    "name": "getMealByDateInitializer",
                     "values": [
                         {
                             "name": {
@@ -263,39 +291,149 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "getMealByDescriptionInitializer",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "when",
+                                "synonyms": [
+                                    "what day",
+                                    "which day",
+                                    "what date",
+                                    "which date"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "pastMealPhrase",
+                    "values": [
+                        {
+                            "id": "past",
+                            "name": {
+                                "value": "we eat",
+                                "synonyms": [
+                                    "I have",
+                                    "I eat",
+                                    "I last have",
+                                    "I last eat",
+                                    "I last had",
+                                    "I last ate",
+                                    "we have",
+                                    "we eat",
+                                    "we last have",
+                                    "we last eat",
+                                    "we last had",
+                                    "we last ate",
+                                    "did I have",
+                                    "did I eat",
+                                    "did I last have",
+                                    "did I last eat",
+                                    "did I last had",
+                                    "did I last ate",
+                                    "did we have",
+                                    "did we eat",
+                                    "did we last have",
+                                    "did we last eat",
+                                    "did we last had",
+                                    "did we last ate",
+                                    "is the last time we ate",
+                                    "is the last day we ate",
+                                    "is the last date we ate",
+                                    "is the last time I ate",
+                                    "is the last day I ate",
+                                    "is the last date I ate",
+                                    "is the last time we had",
+                                    "is the last day we had",
+                                    "is the last date we had",
+                                    "is the last time I had",
+                                    "is the last day I had",
+                                    "is the last date I had",
+                                    "was the last time we ate",
+                                    "was the last day we ate",
+                                    "was the last date we ate",
+                                    "was the last time I ate",
+                                    "was the last day I ate",
+                                    "was the last date I ate",
+                                    "was the last time we had",
+                                    "was the last day we had",
+                                    "was the last date we had",
+                                    "was the last time I had",
+                                    "was the last day I had",
+                                    "was the last date I had"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "futureMealPhrase",
+                    "values": [
+                        {
+                            "id": "future",
+                            "name": {
+                                "value": "will we be eating",
+                                "synonyms": [
+                                    "will we have",
+                                    "will I have",
+                                    "are we have",
+                                    "am I have",
+                                    "are we going to have",
+                                    "am I going to have",
+                                    "will we eat",
+                                    "will I eat",
+                                    "are we eat",
+                                    "am I eat",
+                                    "are we going to eat",
+                                    "am I going to eat",
+                                    "will we be having",
+                                    "will I be having",
+                                    "are we having",
+                                    "am I having",
+                                    "are we going to be having",
+                                    "am I",
+                                    "going to be having",
+                                    "will I be eating",
+                                    "are we eating",
+                                    "am I eating",
+                                    "are we going to be eating",
+                                    "am I going to be eating",
+                                    "are we eating",
+                                    "am I eating"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },
         "dialog": {
             "intents": [
                 {
-                    "name": "GetMealIntent",
+                    "name": "GetMealByDateIntent",
                     "confirmationRequired": false,
                     "prompts": {},
                     "slots": [
                         {
-                            "name": "meal",
-                            "type": "meal",
-                            "confirmationRequired": false,
-                            "elicitationRequired": false,
-                            "prompts": {},
-                            "validations": [
-                                {
-                                    "type": "hasEntityResolutionMatch",
-                                    "prompt": "Slot.Validation.1424888573963.1216637824356.139506818213"
-                                }
-                            ]
-                        },
-                        {
-                            "name": "date",
-                            "type": "AMAZON.DATE",
+                            "name": "getMealByDateInitializer",
+                            "type": "getMealByDateInitializer",
                             "confirmationRequired": false,
                             "elicitationRequired": false,
                             "prompts": {}
                         },
                         {
-                            "name": "getMealInitializer",
-                            "type": "getMealInitializer",
+                            "name": "mealTimeName",
+                            "type": "mealTime",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        },
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE",
                             "confirmationRequired": false,
                             "elicitationRequired": false,
                             "prompts": {}
@@ -304,10 +442,8 @@
                 },
                 {
                     "name": "SetMealsApiUrlIntent",
-                    "confirmationRequired": true,
-                    "prompts": {
-                        "confirmation": "Confirm.Intent.812629481092"
-                    },
+                    "confirmationRequired": false,
+                    "prompts": {},
                     "slots": [
                         {
                             "name": "apiUrlKeyWord",
@@ -318,6 +454,16 @@
                                 "confirmation": "Confirm.Slot.457127692409.1179696007180",
                                 "elicitation": "Elicit.Slot.455939206990.443347637476"
                             }
+                        },
+                        {
+                            "name": "passphrase",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.342508095525.899534359597",
+                                "elicitation": "Elicit.Slot.342508095525.899534359597"
+                            }
                         }
                     ]
                 }
@@ -327,15 +473,6 @@
         "prompts": [
             {
                 "id": "Elicit.Slot.1424888573963.1216637824356",
-                "variations": [
-                    {
-                        "type": "PlainText",
-                        "value": "Which meal?"
-                    }
-                ]
-            },
-            {
-                "id": "Slot.Validation.1424888573963.1216637824356.139506818213",
                 "variations": [
                     {
                         "type": "PlainText",
@@ -366,7 +503,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "I heard {apiUrlKeyWord} , is that correct?"
+                        "value": "I heard {apiUrlKeyWord} . is that correct?"
                     }
                 ]
             },
@@ -376,6 +513,24 @@
                     {
                         "type": "PlainText",
                         "value": "Are you sure you want to set the Meals Menu API URL?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.342508095525.899534359597",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "What is your API passphrase?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.342508095525.899534359597",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "I heard {passphrase} . Is that correct?"
                     }
                 ]
             }
