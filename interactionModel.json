@@ -43,6 +43,7 @@
                         }
                     ],
                     "samples": [
+                        "{getMealByDateInitializer}",
                         "{mealTimeName}",
                         "{date}",
                         "{mealTimeName} {date}",
@@ -97,7 +98,13 @@
                         "what date {mealRequestPhrase}",
                         "which day {mealRequestPhrase}",
                         "what day {mealRequestPhrase}",
-                        "when {mealRequestPhrase}"
+                        "when {mealRequestPhrase}",
+                        "what was the last date {mealRequestPhrase}",
+                        "what is the next date {mealRequestPhrase}",
+                        "what is the next day {mealRequestPhrase}",
+                        "what is the next day {mealRequestPhrase}",
+                        "what is the last time {mealRequestPhrase}",
+                        "what is the next time {mealRequestPhrase}"
                     ]
                 }
             ],
@@ -187,6 +194,16 @@
                 {
                     "name": "getMealByDateInitializer",
                     "values": [
+                        {
+                            "name": {
+                                "value": "what is to eat",
+                                "synonyms": [
+                                    "what's to eat for",
+                                    "what is to eat for",
+                                    "what's to eat"
+                                ]
+                            }
+                        },
                         {
                             "name": {
                                 "value": "what is for",
@@ -288,122 +305,6 @@
                         {
                             "name": {
                                 "value": "about"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "getMealByDescriptionInitializer",
-                    "values": [
-                        {
-                            "name": {
-                                "value": "when",
-                                "synonyms": [
-                                    "what day",
-                                    "which day",
-                                    "what date",
-                                    "which date"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "pastMealPhrase",
-                    "values": [
-                        {
-                            "id": "past",
-                            "name": {
-                                "value": "we eat",
-                                "synonyms": [
-                                    "I have",
-                                    "I eat",
-                                    "I last have",
-                                    "I last eat",
-                                    "I last had",
-                                    "I last ate",
-                                    "we have",
-                                    "we eat",
-                                    "we last have",
-                                    "we last eat",
-                                    "we last had",
-                                    "we last ate",
-                                    "did I have",
-                                    "did I eat",
-                                    "did I last have",
-                                    "did I last eat",
-                                    "did I last had",
-                                    "did I last ate",
-                                    "did we have",
-                                    "did we eat",
-                                    "did we last have",
-                                    "did we last eat",
-                                    "did we last had",
-                                    "did we last ate",
-                                    "is the last time we ate",
-                                    "is the last day we ate",
-                                    "is the last date we ate",
-                                    "is the last time I ate",
-                                    "is the last day I ate",
-                                    "is the last date I ate",
-                                    "is the last time we had",
-                                    "is the last day we had",
-                                    "is the last date we had",
-                                    "is the last time I had",
-                                    "is the last day I had",
-                                    "is the last date I had",
-                                    "was the last time we ate",
-                                    "was the last day we ate",
-                                    "was the last date we ate",
-                                    "was the last time I ate",
-                                    "was the last day I ate",
-                                    "was the last date I ate",
-                                    "was the last time we had",
-                                    "was the last day we had",
-                                    "was the last date we had",
-                                    "was the last time I had",
-                                    "was the last day I had",
-                                    "was the last date I had"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "futureMealPhrase",
-                    "values": [
-                        {
-                            "id": "future",
-                            "name": {
-                                "value": "will we be eating",
-                                "synonyms": [
-                                    "will we have",
-                                    "will I have",
-                                    "are we have",
-                                    "am I have",
-                                    "are we going to have",
-                                    "am I going to have",
-                                    "will we eat",
-                                    "will I eat",
-                                    "are we eat",
-                                    "am I eat",
-                                    "are we going to eat",
-                                    "am I going to eat",
-                                    "will we be having",
-                                    "will I be having",
-                                    "are we having",
-                                    "am I having",
-                                    "are we going to be having",
-                                    "am I",
-                                    "going to be having",
-                                    "will I be eating",
-                                    "are we eating",
-                                    "am I eating",
-                                    "are we going to be eating",
-                                    "am I going to be eating",
-                                    "are we eating",
-                                    "am I eating"
-                                ]
                             }
                         }
                     ]

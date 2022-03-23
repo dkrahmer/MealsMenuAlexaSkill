@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Doug Krahmer. All Rights Reserved.
+ * Copyright 2022 Doug Krahmer. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
  * A copy of the License is located at
@@ -33,31 +33,10 @@ const GetMealByDateIntentHandler = {
 		    return this.getResponseMissingMealsApiUrlBase(handlerInput);
 		}
 		
-		let userTimeZone = "America/Los_Angeles";
-
-		/*
-		// Get device timezone (only works is devleoped using ASK CLI)
-		// See answer from Oliver@Amazon here: https://forums.developer.amazon.com/questions/189615/unable-to-work-with-getupsserviceclient.html
-		const deviceId = Alexa.getDeviceId(handlerInput.requestEnvelope);
-
-		try {
-			const upsServiceClient = handlerInput.serviceClientFactory.getUpsServiceClient();
-			userTimeZone = await upsServiceClient.getSystemTimeZone(deviceId);
-		} catch (error) {
-			if (error.name !== 'ServiceError') {
-                    const speakOutput = "There was a problem connecting to the timezone service.";
-                    return handlerInput.responseBuilder
-				    .speak(speakOutput)
-		        	.withSimpleCard(appName, speakOutput + `deviceId = ${deviceId}`)
-				    .getResponse();
-			}
-			console.log('error', error.message);
-		}
-		*/
-
 		let authorityMealTimeName = getSlotValueAuthority(handlerInput.requestEnvelope, "mealTimeName") || "all";
         
-		const localNowMoment = moment().tz(userTimeZone);
+		const userTimeZoneId = await getUserTimeZoneId(handlerInput);
+		const localNowMoment = moment().tz(userTimeZoneId);
 		const todayDate = localNowMoment.format("YYYY-MM-DD");
 		let date = Alexa.getSlotValue(handlerInput.requestEnvelope, "date") || todayDate; // Default to today's date
 
@@ -77,7 +56,7 @@ const GetMealByDateIntentHandler = {
 
 		let meals;
 
-		const day = moment(date).tz(userTimeZone, true).calendar(localNowMoment, {
+		const day = moment(date).tz(userTimeZoneId, true).calendar(localNowMoment, {
 			sameDay: "[today]",
 			nextDay: "[tomorrow]",
 			nextWeek: "[on] dddd, MMMM Do",
@@ -117,9 +96,9 @@ const GetMealByDateIntentHandler = {
 
 			for (let i = 0; i < mealTimeNames.length; i++) {
 				const mealTimeName = mealTimeNames[i];
-				const mealDecription = meals[mealTimeName];
-				if (mealDecription) {
-					speakMealDescriptions += `${mealTimeName}: ${mealDecription}.  `;
+				const mealDescription = meals[mealTimeName];
+				if (mealDescription) {
+					speakMealDescriptions += `${mealTimeName}: ${mealDescription.split("--")[0].trim()}.  `;
 				}
 			}
 			speakOutput = !speakMealDescriptions ? `Meals ${day} ${(isFutureDate ? "are" : "were")} not planned.` : `Meals ${day} ${(isFutureDate ? "will be" : "were")} as follows: ${speakMealDescriptions}.`;
@@ -127,7 +106,12 @@ const GetMealByDateIntentHandler = {
 		else {
 			speakMealDescriptions = meals[authorityMealTimeName];
 
-			speakOutput = !speakMealDescriptions ? `${authorityMealTimeName} ${day} ${isFutureDate ? "is" : "was"} not planned.` : `${authorityMealTimeName} ${day} ${(isFutureDate ? "will include" : "included")} ${speakMealDescriptions}.`;
+			speakOutput = !speakMealDescriptions ? `${authorityMealTimeName} ${day} ${isFutureDate ? "is" : "was"} not planned.` : `${authorityMealTimeName} ${day} ${(isFutureDate ? "will include" : "included")} ${speakMealDescriptions.split("--")[0].trim()}.`;
+		}
+		
+		let cardExtraMessage = "";
+		if (!speakMealDescriptions) {
+		    cardExtraMessage = " Please ensure the date exists in your Meals Menu Google Sheet and that a description is filled in for the meal.";
 		}
 
 		return handlerInput.responseBuilder
@@ -135,7 +119,7 @@ const GetMealByDateIntentHandler = {
 			// Uncomment the next line if you want to keep the session open so you can
 			// ask for another fact without first re-opening the skill
 			// .reprompt(requestAttributes.t('HELP_REPROMPT'))
-			.withSimpleCard(appName, speakOutput)
+			.withSimpleCard(appName, speakOutput + cardExtraMessage)
 			.withShouldEndSession(true)
 			.getResponse();
 	}
@@ -155,26 +139,30 @@ const GetMealByDescriptionIntentHandler = {
 		    return this.getResponseMissingMealsApiUrlBase(handlerInput);
 		}
 		
-		let userTimeZone = "America/Los_Angeles";
+		const userTimeZoneId = await getUserTimeZoneId(handlerInput);
 		
 		const pastPhraseTemplate1 = [
 		    { values: ["", "did"] },
-		    { values: ["we", "i"] },
-		    { values: ["have", "had", "eat", "ate", "last have", "last eat", "last had", "last ate"]}
+		    { values: ["we", "i", "you"] },
+		    { values: ["", "last"] },
+		    { values: ["have", "had", "eat", "ate", "last have", "last eat", "last had", "last ate", "made", "last made", "make", "last make"]}
 	    ];
 		
 		const pastPhraseTemplate2 = [
-		    { values: ["is the last", "was the last"] },
+		    { values: ["is the last", "it's last", "was the last", "is last", "was last", "did"] },
 		    { values: ["", "time", "day", "date"] },
-		    { values: ["we", "i"] },
-		    { values: ["had", "ate"] }
+		    { values: ["we", "i", "you"] },
+	        { values: ["", "last"] },
+		    { values: ["had", "have", "ate", "eat", "made", "make"] }
 	    ];
 		
 		const futurePhraseTemplate = [
-		    { values: ["will we", "we will", "will i", "i will", "are we", "we are", "we're", "am i", "i am", "i'm", 
-		        "are we going to", "are we gonna", "we are going to", "we are gonna", "we're are going to", "we're are gonna", 
+		    { values: ["", "is the next", "is next"] },
+		    { values: ["", "time", "day", "date"] },
+		    { values: ["will we", "we will", "you will", "will i", "i will", "are we", "we are", "we're", "am i", "i am", "i'm", 
+		        "are we going to", "are we gonna", "we are going to", "we are gonna", "you are going to", "you are gonna", "we're going to", "we're gonna", 
 		        "am i going to", "am i gonna", "i am going to", "i am gonna", "i'm going to", "i'm gonna"] },
-		    { values: ["have", "eat", "having", "eating", "be having", "be eating"] }
+		    { values: ["have", "eat", "having", "eating", "be having", "be eating", "make", "be making"] }
 	    ];
 	    
 		const mealRequestPhrase = getSlotValue(handlerInput.requestEnvelope, "mealRequestPhrase");
@@ -194,8 +182,10 @@ const GetMealByDescriptionIntentHandler = {
         mealDescription = trimPhraseSuffix(mealDescription, phraseSuffixTrimStrings);
 
 	    const when = isFuture ? "future" : "past";
+		const localNowMoment = moment().tz(userTimeZoneId);
+		const todayDate = localNowMoment.format("YYYY-MM-DD");
 	    
-		const mealsApiUrl = `${persistentAttributes.mealsApiUrlBase}${(persistentAttributes.mealsApiUrlBase.includes("?") ? "&" : "?")}function=GetMealByDescription&passphrase=${persistentAttributes.passphrase}&mealDescription=${mealDescription}&when=${when}`;
+		const mealsApiUrl = `${persistentAttributes.mealsApiUrlBase}${(persistentAttributes.mealsApiUrlBase.includes("?") ? "&" : "?")}function=GetMealByDescription&passphrase=${persistentAttributes.passphrase}&mealDescription=${mealDescription}&when=${when}&startDate=${todayDate}`;
 
 		let foundMeal;
 
@@ -220,8 +210,7 @@ const GetMealByDescriptionIntentHandler = {
 		
 		let speakOutput;
 
-	    const localNowMoment = moment().tz(userTimeZone);
-		const day = moment(foundMeal.date).tz(userTimeZone, true).calendar(localNowMoment, {
+		const day = moment(foundMeal.date).tz(userTimeZoneId, true).calendar(localNowMoment, {
 			sameDay: "[today]",
 			nextDay: "[tomorrow]",
 			nextWeek: "[on] dddd, MMMM Do",
@@ -230,7 +219,7 @@ const GetMealByDescriptionIntentHandler = {
 			sameElse: "[on] dddd, MMMM Do YYYY" // Do = 5th, etc.
 	    });
 	    
-	    speakOutput = `${mealDescription} ${(isFuture ? "is" : "was last")} scheduled for ${foundMeal.mealTimeName} ${day} as follows: ${foundMeal.description}`;
+	    speakOutput = `${mealDescription} ${(isFuture ? "is" : "was last")} scheduled for ${foundMeal.mealTimeName} ${day} as follows: ${foundMeal.description.split("--")[0].trim()}`;
 
 		return handlerInput.responseBuilder
 			.speak(speakOutput)
@@ -571,6 +560,24 @@ const getSlotValueAuthority = (requestEnvelope, slotName) => {
     }
 }
 
+const getUserTimeZoneId = async (handlerInput) => {
+    try
+    {
+		const deviceId = handlerInput.requestEnvelope.context.System.device.deviceId;
+        const upsServiceClient = handlerInput.serviceClientFactory.getUpsServiceClient();
+        const userTimeZoneId = await upsServiceClient.getSystemTimeZone(deviceId);
+
+        if (!userTimeZoneId)
+            throw "No timezone ID found";
+        
+        return userTimeZoneId;
+    }
+    catch (ex) {
+        // default time zone ID
+    	return "America/Los_Angeles";
+    }
+}
+
 function getPersistenceAdapter() {
 	// Determines persistence adapter to be used based on environment
 	const s3Adapter = require('ask-sdk-s3-persistence-adapter');
@@ -584,18 +591,19 @@ function getPersistenceAdapter() {
 // defined are included below. The order matters - they're processed top to bottom.
 exports.handler = Alexa.SkillBuilders.custom()
 	.withPersistenceAdapter(getPersistenceAdapter())
+	.withApiClient(new Alexa.DefaultApiClient())
 	.addRequestHandlers(
-		CanFulfillGetMealIntentRequestHandler,
+		//CanFulfillGetMealIntentRequestHandler,
 		GetMealByDateIntentHandler,
 		GetMealByDescriptionIntentHandler,
 		LaunchRequestHandler,
 		SetMealsApiUrlIntentHandler,
-		CanFulfillSetMealsApiUrlIntentRequestHandler,
+		//CanFulfillSetMealsApiUrlIntentRequestHandler,
 		HelpIntentHandler,
 		ExitHandler
 	)
 	.addErrorHandlers(
-		ErrorHandler,
-		CanFulfillIntentRequestErrorHandler
+		ErrorHandler//,
+		//CanFulfillIntentRequestErrorHandler
 	)
 	.lambda();
