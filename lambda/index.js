@@ -1,15 +1,15 @@
 /*
- * Copyright 2022 Doug Krahmer. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
+* Copyright 2022 Doug Krahmer. All Rights Reserved.
+* Licensed under the Apache License, Version 2.0 (the "License").
+* You may not use this file except in compliance with the License.
+* A copy of the License is located at
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* or in the "license" file accompanying this file. This file is distributed
+* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+* express or implied. See the License for the specific language governing
+* permissions and limitations under the License.
+*/
 
 // dependencies
 const Alexa = require("ask-sdk-core");
@@ -30,11 +30,11 @@ const GetMealByDateIntentHandler = {
 		const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
 
 		if (!persistentAttributes.mealsApiUrlBase) {
-		    return this.getResponseMissingMealsApiUrlBase(handlerInput);
+			return this.getResponseMissingMealsApiUrlBase(handlerInput);
 		}
 		
 		let authorityMealTimeName = getSlotValueAuthority(handlerInput.requestEnvelope, "mealTimeName") || "all";
-        
+		
 		const userTimeZoneId = await getUserTimeZoneId(handlerInput);
 		const localNowMoment = moment().tz(userTimeZoneId);
 		const todayDate = localNowMoment.format("YYYY-MM-DD");
@@ -55,36 +55,27 @@ const GetMealByDateIntentHandler = {
 		const mealsApiUrl = `${persistentAttributes.mealsApiUrlBase}${(persistentAttributes.mealsApiUrlBase.includes("?") ? "&" : "?")}function=GetMealsByDate&passphrase=${persistentAttributes.passphrase}&date=${date}`; // date will be in this format: YYYY-MM-DD
 
 		let meals;
-
-		const day = moment(date).tz(userTimeZoneId, true).calendar(localNowMoment, {
-			sameDay: "[today]",
-			nextDay: "[tomorrow]",
-			nextWeek: "[on] dddd, MMMM Do",
-			lastDay: "[yesterday]",
-			lastWeek: "[last] dddd, MMMM Do",
-			sameElse: "[on] dddd, MMMM Do YYYY" // Do = 5th, etc.
-		});
-
+		const day = getDayTerm(localNowMoment, moment(date).tz(userTimeZoneId, true));
 		try {
 			const response = await axios.get(mealsApiUrl);
 
 			if (!response.data.success) {
-    			return handlerInput.responseBuilder
-    			    .speak(`Sorry, the requested date could not be found. Reason: ${response.data.reason || "none given"}`)
-    			    .withShouldEndSession(true)
-    			    .getResponse();
-    		}
+				return handlerInput.responseBuilder
+					.speak(`Sorry, the requested date could not be found. Reason: ${response.data.reason || "none given"}`)
+					.withShouldEndSession(true)
+					.getResponse();
+			}
 			meals = response.data.meals || [];
 		}
 		catch (error) {
 			return handlerInput.responseBuilder
-			    .speak(`Sorry, there was a problem getting meals from the Google Sheets API for ${day}.`)
-			    .withShouldEndSession(true)
-			    .getResponse();
+				.speak(`Sorry, there was a problem getting meals from the Google Sheets API for ${day}.`)
+				.withShouldEndSession(true)
+				.getResponse();
 		}
 		
 		if (!meals[authorityMealTimeName]) {
-		    authorityMealTimeName = "all";
+			authorityMealTimeName = "all";
 		}
 
 		let speakOutput;
@@ -111,7 +102,7 @@ const GetMealByDateIntentHandler = {
 		
 		let cardExtraMessage = "";
 		if (!speakMealDescriptions) {
-		    cardExtraMessage = " Please ensure the date exists in your Meals Menu Google Sheet and that a description is filled in for the meal.";
+			cardExtraMessage = " Please ensure the date exists in your Meals Menu Google Sheet and that a description is filled in for the meal.";
 		}
 
 		return handlerInput.responseBuilder
@@ -136,55 +127,55 @@ const GetMealByDescriptionIntentHandler = {
 		const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
 
 		if (!persistentAttributes.mealsApiUrlBase) {
-		    return this.getResponseMissingMealsApiUrlBase(handlerInput);
+			return this.getResponseMissingMealsApiUrlBase(handlerInput);
 		}
 		
 		const userTimeZoneId = await getUserTimeZoneId(handlerInput);
 		
 		const pastPhraseTemplate1 = [
-		    { values: ["", "did"] },
-		    { values: ["we", "i", "you"] },
-		    { values: ["", "last"] },
-		    { values: ["have", "had", "eat", "ate", "last have", "last eat", "last had", "last ate", "made", "last made", "make", "last make"]}
-	    ];
+			{ values: ["", "did"] },
+			{ values: ["", "we", "i", "you", "the", "to"] },
+			{ values: ["", "last"] },
+			{ values: ["have", "had", "eat", "ate", "eight", "gate", "made", "make", "get", "got"]}
+		];
 		
 		const pastPhraseTemplate2 = [
-		    { values: ["is the last", "it's last", "was the last", "is last", "was last", "did"] },
-		    { values: ["", "time", "day", "date"] },
-		    { values: ["we", "i", "you"] },
-	        { values: ["", "last"] },
-		    { values: ["had", "have", "ate", "eat", "made", "make"] }
-	    ];
+			{ values: ["is the last", "the last", "it's last", "was the last", "is last", "was last", "did"] },
+			{ values: ["", "time", "day", "date"] },
+			{ values: ["", "we", "i", "you", "the", "to"] },
+			{ values: ["", "last"] },
+			{ values: ["had", "have", "eat", "ate", "eight", "gate", "made", "make", "get", "got"] }
+		];
 		
 		const futurePhraseTemplate = [
-		    { values: ["", "is the next", "is next"] },
-		    { values: ["", "time", "day", "date"] },
-		    { values: ["will we", "we will", "you will", "will i", "i will", "are we", "we are", "we're", "am i", "i am", "i'm", 
-		        "are we going to", "are we gonna", "we are going to", "we are gonna", "you are going to", "you are gonna", "we're going to", "we're gonna", 
-		        "am i going to", "am i gonna", "i am going to", "i am gonna", "i'm going to", "i'm gonna"] },
-		    { values: ["have", "eat", "having", "eating", "be having", "be eating", "make", "be making"] }
-	    ];
-	    
+			{ values: ["", "is the next", "is next", "next", "the next"] },
+			{ values: ["", "time", "day", "date"] },
+			{ values: ["will we", "we will", "you will", "will i", "i will", "are we", "we are", "we're", "am i", "i am", "i'm", 
+				"are we going to", "are we gonna", "we are going to", "we are gonna", "you are going to", "you are gonna", "we going", "we going to", "we're going to", "we're gonna", 
+				"am i going to", "am i gonna", "i am going to", "i am gonna", "i'm going to", "i'm gonna"] },
+			{ values: ["have", "eat", "having", "eating", "be having", "be eating", "make", "be making"] }
+		];
+		
 		const mealRequestPhrase = getSlotValue(handlerInput.requestEnvelope, "mealRequestPhrase");
-	    let mealDescription = getPhraseSuffix(mealRequestPhrase, pastPhraseTemplate1) || getPhraseSuffix(mealRequestPhrase, pastPhraseTemplate2);
+		let mealDescription = getPhraseSuffix(mealRequestPhrase, pastPhraseTemplate1) || getPhraseSuffix(mealRequestPhrase, pastPhraseTemplate2);
 
 		const isFuture = !mealDescription;
 
 		mealDescription = mealDescription || getPhraseSuffix(mealRequestPhrase, futurePhraseTemplate);
-	    if (!mealDescription) {
+		if (!mealDescription) {
 			return handlerInput.responseBuilder
-			    .speak(`I could not understand your request: ${mealRequestPhrase}`)
-			    .withShouldEndSession(true)
-			    .getResponse();
-	    }
-	    
-        const phraseSuffixTrimStrings = [ "next", "again", "last" ];
-        mealDescription = trimPhraseSuffix(mealDescription, phraseSuffixTrimStrings);
+				.speak(`I could not understand your request: ${mealRequestPhrase}`)
+				.withShouldEndSession(true)
+				.getResponse();
+		}
+		
+		const phraseSuffixTrimStrings = [ "next", "again", "last" ];
+		mealDescription = trimPhraseSuffix(mealDescription, phraseSuffixTrimStrings);
 
-	    const when = isFuture ? "future" : "past";
+		const when = isFuture ? "future" : "past";
 		const localNowMoment = moment().tz(userTimeZoneId);
 		const todayDate = localNowMoment.format("YYYY-MM-DD");
-	    
+		
 		const mealsApiUrl = `${persistentAttributes.mealsApiUrlBase}${(persistentAttributes.mealsApiUrlBase.includes("?") ? "&" : "?")}function=GetMealByDescription&passphrase=${persistentAttributes.passphrase}&mealDescription=${mealDescription}&when=${when}&startDate=${todayDate}`;
 
 		let foundMeal;
@@ -193,33 +184,25 @@ const GetMealByDescriptionIntentHandler = {
 			const response = await axios.get(mealsApiUrl);
 
 			if (!response.data.success || !response.data.meal) {
-    			return handlerInput.responseBuilder
-    			    .speak(`I could not find ${mealDescription} in a ${when} meal.`)
-    			    .withShouldEndSession(true)
-    			    .getResponse();
-    		}
-    		
+				return handlerInput.responseBuilder
+					.speak(`I could not find ${mealDescription} in a ${when} meal.`)
+					.withShouldEndSession(true)
+					.getResponse();
+			}
+			
 			foundMeal = response.data.meal;
 		}
 		catch (error) {
 			return handlerInput.responseBuilder
-			    .speak(`Sorry, there was a problem searching meals from the Google Sheets API for ${mealDescription}.`)
-			    .withShouldEndSession(true)
-			    .getResponse();
+				.speak(`Sorry, there was a problem searching meals from the Google Sheets API for ${mealDescription}.`)
+				.withShouldEndSession(true)
+				.getResponse();
 		}
 		
 		let speakOutput;
-
-		const day = moment(foundMeal.date).tz(userTimeZoneId, true).calendar(localNowMoment, {
-			sameDay: "[today]",
-			nextDay: "[tomorrow]",
-			nextWeek: "[on] dddd, MMMM Do",
-			lastDay: "[yesterday]",
-			lastWeek: "[last] dddd, MMMM Do",
-			sameElse: "[on] dddd, MMMM Do YYYY" // Do = 5th, etc.
-	    });
-	    
-	    speakOutput = `${mealDescription} ${(isFuture ? "is" : "was last")} scheduled for ${foundMeal.mealTimeName} ${day} as follows: ${foundMeal.description.split("--")[0].trim()}`;
+		const day = getDayTerm(localNowMoment, moment(foundMeal.date).tz(userTimeZoneId, true));
+			
+		speakOutput = `${mealDescription} ${(isFuture ? "is" : "was last")} scheduled for ${foundMeal.mealTimeName} ${day} as follows: ${foundMeal.description.split("--")[0].trim()}`;
 
 		return handlerInput.responseBuilder
 			.speak(speakOutput)
@@ -233,46 +216,46 @@ const GetMealByDescriptionIntentHandler = {
 };
 
 const getPhraseSuffix = (phrase, phraseTemplate) => {
-    phrase = phrase.trim().toLowerCase(); // standardize the input
-    
-    for (let i = 0; i < phraseTemplate.length; i++) {
-        const phraseTemplateElement = phraseTemplate[i];
-        let matchingPhrasePortion = null;
-        
-        for (let j = 0; j < phraseTemplateElement.values.length; j++) {
-            const phrasePortion = phraseTemplateElement.values[j];
-            if ((matchingPhrasePortion === null || phrasePortion.length > matchingPhrasePortion.length)
-                    && (phrasePortion === "" || phrase.startsWith(phrasePortion))) {
-                matchingPhrasePortion = phrasePortion; // save the longest match
-            }
-        }
+	phrase = phrase.trim().toLowerCase(); // standardize the input
+	
+	for (let i = 0; i < phraseTemplate.length; i++) {
+		const phraseTemplateElement = phraseTemplate[i];
+		let matchingPhrasePortion = null;
+		
+		for (let j = 0; j < phraseTemplateElement.values.length; j++) {
+			const phrasePortion = phraseTemplateElement.values[j];
+			if ((matchingPhrasePortion === null || phrasePortion.length > matchingPhrasePortion.length)
+					&& (phrasePortion === "" || phrase.startsWith(phrasePortion))) {
+				matchingPhrasePortion = phrasePortion; // save the longest match
+			}
+		}
 
-        if (matchingPhrasePortion === null) 
-            return null; // does not match
-            
-        phrase = phrase.substr(matchingPhrasePortion.length).trim();
-    }
-    
-    return phrase; // The first part of the phrase has been removed, leaving the suffix
+		if (matchingPhrasePortion === null) 
+			return null; // does not match
+			
+		phrase = phrase.substr(matchingPhrasePortion.length).trim();
+	}
+	
+	return phrase; // The first part of the phrase has been removed, leaving the suffix
 }
 
 const trimPhraseSuffix = (phrase, phraseSuffixTrimStrings) => {
-    phrase = phrase.trim().toLowerCase(); // standardize the input
-    
-    for (let i = 0; i < phraseSuffixTrimStrings.length; i++) {
-        const phraseSuffixTrimString = phraseSuffixTrimStrings[i];
-        let matchingPhrasePortion = null;
+	phrase = phrase.trim().toLowerCase(); // standardize the input
+	
+	for (let i = 0; i < phraseSuffixTrimStrings.length; i++) {
+		const phraseSuffixTrimString = phraseSuffixTrimStrings[i];
+		let matchingPhrasePortion = null;
 
-        if ((matchingPhrasePortion === null || phraseSuffixTrimString.length > matchingPhrasePortion.length)
-                && phrase.endsWith(phraseSuffixTrimString)) {
-            matchingPhrasePortion = phraseSuffixTrimString; // save the longest match
-        }
-        
-        if (matchingPhrasePortion)
-            phrase = phrase.substr(0, phrase.length - matchingPhrasePortion.length).trim();
-    }
-    
-    return phrase; // The first part of the phrase has been removed, leaving the suffix
+		if ((matchingPhrasePortion === null || phraseSuffixTrimString.length > matchingPhrasePortion.length)
+				&& phrase.endsWith(phraseSuffixTrimString)) {
+			matchingPhrasePortion = phraseSuffixTrimString; // save the longest match
+		}
+		
+		if (matchingPhrasePortion)
+			phrase = phrase.substr(0, phrase.length - matchingPhrasePortion.length).trim();
+	}
+	
+	return phrase; // The first part of the phrase has been removed, leaving the suffix
 }
 
 const getResponseMissingMealsApiUrlBase = (handlerInput) => {
@@ -300,16 +283,16 @@ const CanFulfillGetMealIntentRequestHandler = {
 
 		const canFulfill = mealFulfill // fulfill if only the meal is available
 			|| (getMealInitializerFulfill && getMealInitializer.length > 6 && dateFulfill); // fulfill if the getMealInitializer is not short and date is available
-        
-        // Documentation:
-        //      https://developer.amazon.com/en-US/docs/alexa/custom-skills/implement-canfulfillintentrequest-for-name-free-interaction.html
-        //      https://developer.amazon.com/en-US/docs/alexa/custom-skills/understand-name-free-interaction-for-custom-skills.html
-        //      https://developer.amazon.com/en-US/docs/alexa/custom-skills/request-types-reference.html#canfulfillintent
-        //      https://developer.amazon.com/en-US/docs/alexa/custom-skills/request-types-reference.html#CanFulfillIntentRequest
-        
-        // Approach to validating slot values with custom getSlotValues function: https://github.com/bbezerra82/canFulfillIntentRequest/blob/master/canFulfillPaul/lambda/custom/index.js
-        
-        const ability = {
+		
+		// Documentation:
+		//      https://developer.amazon.com/en-US/docs/alexa/custom-skills/implement-canfulfillintentrequest-for-name-free-interaction.html
+		//      https://developer.amazon.com/en-US/docs/alexa/custom-skills/understand-name-free-interaction-for-custom-skills.html
+		//      https://developer.amazon.com/en-US/docs/alexa/custom-skills/request-types-reference.html#canfulfillintent
+		//      https://developer.amazon.com/en-US/docs/alexa/custom-skills/request-types-reference.html#CanFulfillIntentRequest
+		
+		// Approach to validating slot values with custom getSlotValues function: https://github.com/bbezerra82/canFulfillIntentRequest/blob/master/canFulfillPaul/lambda/custom/index.js
+		
+		const ability = {
 				"canFulfill": canFulfill ? "YES" : "NO",
 				"slots": {  // slots
 					"getMealInitializer": {
@@ -324,12 +307,12 @@ const CanFulfillGetMealIntentRequestHandler = {
 					},
 				}
 			};
-        
+		
 		return handlerInput.responseBuilder
 			.withCanFulfillIntent(ability)
 			.getResponse();
 
-        /*
+		/*
 		return handlerInput.responseBuilder
 			.withCanFulfillIntent({
 				"canFulfill": canFulfill ? "YES" : "NO",
@@ -491,7 +474,7 @@ const ExitHandler = {
 		const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
 
 		return handlerInput.responseBuilder
-		    .withShouldEndSession(true)
+			.withShouldEndSession(true)
 			.getResponse(); // just exit silently
 	},
 };
@@ -532,50 +515,75 @@ const CanFulfillIntentRequestErrorHandler = {
 
 const getSlotValue = (requestEnvelope, slotName) => {
 	try {
-	    const slot = Alexa.getSlot(requestEnvelope, slotName);
-	    if (!slot)
-	        return null;
-	        
-	    return slot.value;
-    }
-    catch (error) {
-        return null;
-    }
+		const slot = Alexa.getSlot(requestEnvelope, slotName);
+		if (!slot)
+			return null;
+			
+		return slot.value;
+	}
+	catch (error) {
+		return null;
+	}
 }
 
 const getSlotValueAuthority = (requestEnvelope, slotName) => {
 	try {
-	    const slot = Alexa.getSlot(requestEnvelope, slotName);
-	    if (!slot)
-	        return null;
-	        
-	    const resolutions = slot.resolutions;
-	    if (!slot.resolutions || !slot.resolutions.resolutionsPerAuthority)
-	        return null;
-	        
-	    return resolutions.resolutionsPerAuthority[0].values[0].value.name;
-    }
-    catch (error) {
-        return null;
-    }
+		const slot = Alexa.getSlot(requestEnvelope, slotName);
+		if (!slot)
+			return null;
+			
+		const resolutions = slot.resolutions;
+		if (!slot.resolutions || !slot.resolutions.resolutionsPerAuthority)
+			return null;
+			
+		return resolutions.resolutionsPerAuthority[0].values[0].value.name;
+	}
+	catch (error) {
+		return null;
+	}
 }
 
 const getUserTimeZoneId = async (handlerInput) => {
-    try
-    {
+	try
+	{
 		const deviceId = handlerInput.requestEnvelope.context.System.device.deviceId;
-        const upsServiceClient = handlerInput.serviceClientFactory.getUpsServiceClient();
-        const userTimeZoneId = await upsServiceClient.getSystemTimeZone(deviceId);
+		const upsServiceClient = handlerInput.serviceClientFactory.getUpsServiceClient();
+		const userTimeZoneId = await upsServiceClient.getSystemTimeZone(deviceId);
 
-        if (!userTimeZoneId)
-            throw "No timezone ID found";
-        
-        return userTimeZoneId;
-    }
-    catch (ex) {
-        // default time zone ID
-    	return "America/Los_Angeles";
-    }
+		if (!userTimeZoneId)
+			throw "No timezone ID found";
+		
+		return userTimeZoneId;
+	}
+	catch (ex) {
+		// default time zone ID
+		return "America/Los_Angeles";
+	}
+}
+
+const momentFormats = {
+	sameDay: "[today]",
+	nextDay: "[tomorrow]",
+	nextWeek: "[on] dddd, MMMM Do",
+	lastDay: "[yesterday]",
+	lastWeek: "[last] dddd, MMMM Do",
+	sameElse: "[on] dddd, MMMM Do YYYY" // Do = 5th, etc.
+};
+
+const getDayTerm = (startMoment, targetMoment) =>
+{
+	startMoment = startMoment.startOf("day");
+	targetMoment = targetMoment.startOf("day");
+
+	let day = targetMoment.calendar(startMoment, momentFormats);
+	let daysDiff = startMoment.diff(targetMoment, "days");
+	const isFuture = daysDiff < 0;
+	daysDiff = Math.abs(daysDiff);
+	
+	if (daysDiff > 1)
+		day = (isFuture ? `in ${daysDiff} days` : `${daysDiff} days ago`) + ", " + day;
+	
+	return day;
 }
 
 function getPersistenceAdapter() {

@@ -94,6 +94,8 @@
                         }
                     ],
                     "samples": [
+                        "what's {mealRequestPhrase}",
+                        "when's {mealRequestPhrase}",
                         "which date {mealRequestPhrase}",
                         "what date {mealRequestPhrase}",
                         "which day {mealRequestPhrase}",
@@ -102,7 +104,7 @@
                         "what was the last date {mealRequestPhrase}",
                         "what is the next date {mealRequestPhrase}",
                         "what is the next day {mealRequestPhrase}",
-                        "what is the next day {mealRequestPhrase}",
+                        "what's the next day {mealRequestPhrase}",
                         "what is the last time {mealRequestPhrase}",
                         "what is the next time {mealRequestPhrase}"
                     ]
@@ -116,6 +118,7 @@
                             "name": {
                                 "value": "all",
                                 "synonyms": [
+                                    "chow",
                                     "eating",
                                     "meal",
                                     "refreshment",
@@ -143,6 +146,8 @@
                             "name": {
                                 "value": "dessert",
                                 "synonyms": [
+                                    "afters",
+                                    "pudding",
                                     "cakes",
                                     "confections",
                                     "confection",
@@ -158,6 +163,10 @@
                             "name": {
                                 "value": "supper",
                                 "synonyms": [
+                                    "din-din",
+                                    "din din",
+                                    "the main meal",
+                                    "main meal",
                                     "evening meal",
                                     "tonight",
                                     "evening",
@@ -171,6 +180,7 @@
                             "name": {
                                 "value": "lunch",
                                 "synonyms": [
+                                    "after noon meal",
                                     "noon meal",
                                     "afternoon meal",
                                     "afternoon",
@@ -182,6 +192,9 @@
                             "name": {
                                 "value": "breakfast",
                                 "synonyms": [
+                                    "breaky",
+                                    "brekkie",
+                                    "brekky",
                                     "the morning",
                                     "morning meal",
                                     "in the morning",
